@@ -158,8 +158,10 @@ function VideoPlayer() {
                 allowFullScreen
                 frameBorder="0"
                 scrolling="no"
+                referrerPolicy="no-referrer"
+                sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
                 onLoad={() => setPlayerLoading(false)}
-              />
+              ></iframe>
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-black/60 backdrop-blur-3xl">
                 <FiPlay className="text-6xl text-anime-primary mb-4 animate-pulse" />
@@ -276,7 +278,7 @@ function VideoPlayer() {
                     <button
                       onClick={() => {
                         setSelectedType('mix');
-                        const s = { id: 'megacloud', name: 'MegaCloud ☁️', custom: true, link: `https://vidsrc.cc/v2/embed/anime/${id}/${ep}/sub?server=megacloud` };
+                        const s = { id: 'megacloud', name: 'MegaCloud ☁️', custom: true, link: `https://vidsrc.xyz/embed/anime/${id}/${ep}` };
                         setSelectedServer(s);
                         setIframeUrl(s.link);
                         setPlayerLoading(true);
@@ -288,7 +290,7 @@ function VideoPlayer() {
                     <button
                       onClick={() => {
                         setSelectedType('mix');
-                        const s = { id: 't-cloud', name: 'T-Cloud ⚡', custom: true, link: `https://vidsrc.cc/v2/embed/anime/${id}/${ep}/sub?server=upcloud` };
+                        const s = { id: 't-cloud', name: 'T-Cloud ⚡', custom: true, link: `https://v2.vidsrc.me/embed/anime/${id}/${ep}` };
                         setSelectedServer(s);
                         setIframeUrl(s.link);
                         setPlayerLoading(true);
