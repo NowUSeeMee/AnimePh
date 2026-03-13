@@ -117,9 +117,14 @@ async function fetchServers(episodeId) {
 
     $('.servers-sub .server-item').each((i, el) => {
       let serverName = $(el).find('.btn').text().trim() || $(el).text().trim();
+      
+      // Aniwatch Style Server Name Normalization
       if (serverName.toLowerCase().includes('aniwatch')) {
           serverName = 'HD Server';
+      } else if (serverName.toLowerCase().includes('rapid') || serverName.toLowerCase().includes('vidstreaming')) {
+          serverName = 'T-Cloud'; // Map RapidCloud/VidStreaming to T-Cloud
       }
+
       servers.sub.push({
         id: $(el).attr('data-id'),
         name: serverName,
@@ -129,9 +134,14 @@ async function fetchServers(episodeId) {
 
     $('.servers-dub .server-item').each((i, el) => {
       let serverName = $(el).find('.btn').text().trim() || $(el).text().trim();
+      
+      // Aniwatch Style Server Name Normalization
       if (serverName.toLowerCase().includes('aniwatch')) {
           serverName = 'HD Server';
+      } else if (serverName.toLowerCase().includes('rapid') || serverName.toLowerCase().includes('vidstreaming')) {
+          serverName = 'T-Cloud'; // Map RapidCloud/VidStreaming to T-Cloud
       }
+      
       servers.dub.push({
         id: $(el).attr('data-id'),
         name: serverName,

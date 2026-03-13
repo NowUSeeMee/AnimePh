@@ -19,6 +19,7 @@ function VideoPlayer() {
   const [selectedServer, setSelectedServer] = useState(null);
   const [iframeUrl, setIframeUrl] = useState(null);
   const [playerLoading, setPlayerLoading] = useState(false);
+  const [serverLabels, setServerLabels] = useState({ sub: '3', dub: 'D', raw: 'R' });
 
   // The episode passed from AnimeDetails state, if available
   const currentEpisodeData = location.state?.episodeData || episodes.find(e => e.episode_number === parseInt(ep));
@@ -189,33 +190,24 @@ function VideoPlayer() {
                 </div>
               </div>
             )}
-            
-            {/* Status Overlay */}
-            <div className="absolute top-6 left-6 z-30 flex gap-2">
-              <div className="bg-black/40 backdrop-blur-xl px-3 py-1.5 rounded-xl text-[10px] font-bold border border-white/10 text-white uppercase tracking-wider">
-                {selectedServer?.custom ? selectedServer.name : (selectedServer?.name || 'Loading Server...')}
-              </div>
-              <div className="bg-anime-primary/20 backdrop-blur-xl px-3 py-1.5 rounded-xl text-[10px] font-bold border border-anime-primary/20 text-anime-primary uppercase tracking-wider">
-                {selectedType}
-              </div>
-            </div>
+            {/* Status Overlay Removed as per user request */}
           </div>
 
           {/* Server Switcher UI (Inspired by User Screenshot) */}
           <div className="glass-card p-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-6 justify-between select-none">
               <div className="flex flex-col gap-4 w-full">
-                {/* SUB Servers (PRIORITY) */}
+                {/* SUB Servers */}
                 {servers.sub.length > 0 && (
                   <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1.5 text-[11px] font-black text-white/70 uppercase tracking-widest min-w-[55px]">
-                      <FiType className="text-[#ff8a9f] text-sm" /> SUB:
+                    <span className="flex items-center justify-center text-[11px] font-black text-white/50 bg-white/5 w-8 h-8 rounded-lg uppercase tracking-tight">
+                      3:
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {servers.sub.map((s) => (
                         <button
                           key={s.id}
                           onClick={() => { setSelectedType('sub'); handleServerChange(s); }}
-                          className={`px-5 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === s.id ? 'bg-[#2b2b36] border-[#7d75db] text-[#7d75db] shadow-[0_0_15px_rgba(125,117,219,0.15)]' : 'bg-[#1e1e24] border-[#1e1e24] text-gray-400 hover:bg-[#2b2b36] hover:text-gray-200'}`}
+                          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all border ${selectedServer?.id === s.id && !selectedServer?.custom ? 'bg-[#FFD700] border-[#FFD700] text-black shadow-[0_0_20px_rgba(255,215,0,0.3)]' : 'bg-[#2a2a2a] border-white/5 text-white/70 hover:bg-[#333] hover:text-white'}`}
                         >
                           {s.name}
                         </button>
@@ -224,18 +216,18 @@ function VideoPlayer() {
                   </div>
                 )}
                 
-                {/* DUB Servers (PRIORITY) */}
+                {/* DUB Servers */}
                 {servers.dub.length > 0 && (
                   <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1.5 text-[11px] font-black text-white/70 uppercase tracking-widest min-w-[55px]">
-                      <FiMic className="text-[#ff8a9f] text-sm" /> DUB:
+                    <span className="flex items-center justify-center text-[11px] font-black text-white/50 bg-white/5 w-8 h-8 rounded-lg uppercase tracking-tight">
+                      D:
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {servers.dub.map((s) => (
                         <button
                           key={s.id}
                           onClick={() => { setSelectedType('dub'); handleServerChange(s); }}
-                          className={`px-5 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === s.id ? 'bg-[#2b2b36] border-[#7d75db] text-[#7d75db] shadow-[0_0_15px_rgba(125,117,219,0.15)]' : 'bg-[#1e1e24] border-[#1e1e24] text-gray-400 hover:bg-[#2b2b36] hover:text-gray-200'}`}
+                          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all border ${selectedServer?.id === s.id && !selectedServer?.custom ? 'bg-[#FFD700] border-[#FFD700] text-black shadow-[0_0_20px_rgba(255,215,0,0.3)]' : 'bg-[#2a2a2a] border-white/5 text-white/70 hover:bg-[#333] hover:text-white'}`}
                         >
                           {s.name}
                         </button>
@@ -244,18 +236,19 @@ function VideoPlayer() {
                   </div>
                 )}
 
-                {/* EXTRA / Mirror Servers */}
-                {servers.extra && servers.extra.length > 0 && (
+                {/* MIX/EXTRA Servers (Labeled as B: for Backup or Both) */}
+                {((servers.extra && servers.extra.length > 0) || (servers.mix && servers.mix.length > 0)) && (
                   <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1.5 text-[10px] font-black text-anime-muted uppercase tracking-widest min-w-[45px]">
-                      <FiSettings className="text-anime-secondary" /> MISC:
+                    <span className="flex items-center justify-center text-[11px] font-black text-white/50 bg-white/5 w-8 h-8 rounded-lg uppercase tracking-tight">
+                      B:
                     </span>
                     <div className="flex flex-wrap gap-2">
-                      {servers.extra.map((s) => (
+                      {/* Mix/Extra Servers */}
+                      {[...(servers.mix || []), ...(servers.extra || [])].map((s) => (
                         <button
                           key={s.id}
                           onClick={() => { setSelectedType('extra'); handleServerChange(s); }}
-                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === s.id ? 'bg-anime-primary/20 border-anime-primary text-anime-primary shadow-[0_0_15px_rgba(99,102,241,0.2)]' : 'bg-white/5 border-white/5 text-anime-muted hover:bg-white/10 hover:text-white'}`}
+                          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all border ${selectedServer?.id === s.id ? 'bg-[#FFD700] border-[#FFD700] text-black shadow-[0_0_20px_rgba(255,215,0,0.3)]' : 'bg-[#2a2a2a] border-white/5 text-white/70 hover:bg-[#333] hover:text-white'}`}
                         >
                           {s.name}
                         </button>
@@ -263,7 +256,6 @@ function VideoPlayer() {
                     </div>
                   </div>
                 )}
-
               </div>
 
              <div className="flex gap-2 shrink-0 self-end sm:self-center">
