@@ -62,6 +62,7 @@ function VideoPlayer() {
       } else {
         setIframeUrl(null);
       }
+      // Trigger Vercel redeploy with valid author
     } catch (err) {
       console.error('Source fetch error:', err);
       setIframeUrl(null);
