@@ -21,6 +21,8 @@ app.get('/api', (req, res) => {
     res.json({ 
         status: 'online', 
         message: 'AnimePh API is active',
+        version: '1.2.0',
+        last_updated: '2026-03-13T23:50:00Z',
         endpoints: [
             '/api/favorites',
             '/api/episodes/:id',
@@ -232,11 +234,14 @@ app.get('/api/episodes/servers/:episodeId', async (req, res) => {
             addUniqueServer(servers.sub, { id: 'vidsrc-cc', name: 'VidSrc-CC', custom: true, type: 'iframe', link: `https://vidsrc.cc/v2/embed/anime/${mal_id}/${ep}/sub` });
             addUniqueServer(servers.dub, { id: 'vidsrc-cc-dub', name: 'VidSrc-CC', custom: true, type: 'iframe', link: `https://vidsrc.cc/v2/embed/anime/${mal_id}/${ep}/dub` });
             
-            // Fallback Mirrors
+            // Fallback Mirrors & Aggregators
             addUniqueServer(servers.extra, { id: 'vidsrc-to', name: 'Mirror 1', custom: true, type: 'iframe', link: `https://vidsrc.to/embed/anime/${mal_id}/${ep}` });
             addUniqueServer(servers.extra, { id: 'vidsrc-pm', name: 'Mirror 2', custom: true, type: 'iframe', link: `https://vidsrc.pm/embed/anime/${mal_id}/${ep}` });
             addUniqueServer(servers.extra, { id: 'vidsrc-icu', name: 'Mirror 3', custom: true, type: 'iframe', link: `https://vidsrc.icu/embed/anime/${mal_id}/${ep}` });
+            addUniqueServer(servers.extra, { id: 'vidsrc-vip', name: 'Mirror 4', custom: true, type: 'iframe', link: `https://vidsrc.vip/embed/anime/${mal_id}/${ep}` });
+            addUniqueServer(servers.extra, { id: 'vidsrc-in', name: 'Mirror 5', custom: true, type: 'iframe', link: `https://vidsrc.in/embed/anime/${mal_id}/${ep}` });
             addUniqueServer(servers.extra, { id: 'embed-su', name: 'High Speed 🚀', custom: true, type: 'iframe', link: `https://embed.su/embed/anime/${mal_id}/${ep}` });
+            addUniqueServer(servers.extra, { id: 'vidsrc2-to', name: 'Ultra HD 💎', custom: true, type: 'iframe', link: `https://vidsrc2.to/embed/anime/${mal_id}/${ep}` });
         }
         res.json(servers);
     } catch (err) {

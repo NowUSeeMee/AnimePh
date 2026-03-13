@@ -245,9 +245,9 @@ function VideoPlayer() {
                   </div>
                 )}
 
-                {/* MIX/EXTRA Servers (Labeled as B: for Backup or Both) */}
+                {/* B: Backup Mirrors - Always visible if populated */}
                 {((servers.extra && servers.extra.length > 0) || (servers.mix && servers.mix.length > 0)) && (
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 mt-2 pt-4 border-t border-white/5">
                     <span className="flex items-center justify-center text-[11px] font-black text-white/50 bg-white/5 w-8 h-8 rounded-lg uppercase tracking-tight">
                       B:
                     </span>
@@ -265,6 +265,11 @@ function VideoPlayer() {
                     </div>
                   </div>
                 )}
+                
+                {/* Deployment Sync Check Hint */}
+                <div className="text-[9px] text-white/20 mt-2 flex justify-between items-center tabular-nums">
+                  <span>API v1.2.0 • If mirrors are missing, please hard-refresh (Ctrl+F5)</span>
+                </div>
               </div>
 
              <div className="flex gap-2 shrink-0 self-end sm:self-center">
