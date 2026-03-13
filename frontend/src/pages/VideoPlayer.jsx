@@ -272,6 +272,30 @@ function VideoPlayer() {
                     >
                       Vidsrc.cc
                     </button>
+                    <button
+                      onClick={() => {
+                        setSelectedType('mix');
+                        const s = { id: 'megacloud', name: 'MegaCloud ☁️', custom: true, link: `https://vidsrc.me/embed/anime/${id}/${ep}?server=megacloud` };
+                        setSelectedServer(s);
+                        setIframeUrl(s.link);
+                        setPlayerLoading(true);
+                      }}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === 'megacloud' ? 'bg-anime-primary/20 border-anime-primary text-anime-primary' : 'bg-white/5 border-white/5 text-anime-muted hover:bg-white/10 hover:text-white'}`}
+                    >
+                      MegaCloud
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedType('mix');
+                        const s = { id: 't-cloud', name: 'T-Cloud ⚡', custom: true, link: `https://vidsrc.me/embed/anime/${id}/${ep}?server=upcloud` };
+                        setSelectedServer(s);
+                        setIframeUrl(s.link);
+                        setPlayerLoading(true);
+                      }}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === 't-cloud' ? 'bg-anime-primary/20 border-anime-primary text-anime-primary' : 'bg-white/5 border-white/5 text-anime-muted hover:bg-white/10 hover:text-white'}`}
+                    >
+                      T-Cloud
+                    </button>
                   </div>
                 </div>
               </div>
