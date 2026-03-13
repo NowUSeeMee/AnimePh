@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const BASE_URL = 'https://aniwatchtv.to';
+const BASE_URL = 'https://aniwatchtv.by'; 
 
 // Shared instance to mimic browser behavior
 const axiosInstance = axios.create({
