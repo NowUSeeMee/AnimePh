@@ -207,15 +207,15 @@ function VideoPlayer() {
                 {/* SUB Servers (PRIORITY) */}
                 {servers.sub.length > 0 && (
                   <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1.5 text-[10px] font-black text-anime-muted uppercase tracking-widest min-w-[45px]">
-                      <FiType className="text-anime-secondary" /> SUB:
+                    <span className="flex items-center gap-1.5 text-[11px] font-black text-white/70 uppercase tracking-widest min-w-[55px]">
+                      <FiType className="text-[#ff8a9f] text-sm" /> SUB:
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {servers.sub.map((s) => (
                         <button
                           key={s.id}
                           onClick={() => { setSelectedType('sub'); handleServerChange(s); }}
-                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === s.id && !selectedServer?.custom ? 'bg-anime-primary/20 border-anime-primary text-anime-primary shadow-[0_0_15px_rgba(99,102,241,0.2)]' : 'bg-white/5 border-white/5 text-anime-muted hover:bg-white/10 hover:text-white'}`}
+                          className={`px-5 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === s.id ? 'bg-[#2b2b36] border-[#7d75db] text-[#7d75db] shadow-[0_0_15px_rgba(125,117,219,0.15)]' : 'bg-[#1e1e24] border-[#1e1e24] text-gray-400 hover:bg-[#2b2b36] hover:text-gray-200'}`}
                         >
                           {s.name}
                         </button>
@@ -227,15 +227,15 @@ function VideoPlayer() {
                 {/* DUB Servers (PRIORITY) */}
                 {servers.dub.length > 0 && (
                   <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1.5 text-[10px] font-black text-anime-muted uppercase tracking-widest min-w-[45px]">
-                      <FiMic className="text-anime-secondary" /> DUB:
+                    <span className="flex items-center gap-1.5 text-[11px] font-black text-white/70 uppercase tracking-widest min-w-[55px]">
+                      <FiMic className="text-[#ff8a9f] text-sm" /> DUB:
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {servers.dub.map((s) => (
                         <button
                           key={s.id}
                           onClick={() => { setSelectedType('dub'); handleServerChange(s); }}
-                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === s.id && !selectedServer?.custom ? 'bg-anime-primary/20 border-anime-primary text-anime-primary shadow-[0_0_15px_rgba(99,102,241,0.2)]' : 'bg-white/5 border-white/5 text-anime-muted hover:bg-white/10 hover:text-white'}`}
+                          className={`px-5 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === s.id ? 'bg-[#2b2b36] border-[#7d75db] text-[#7d75db] shadow-[0_0_15px_rgba(125,117,219,0.15)]' : 'bg-[#1e1e24] border-[#1e1e24] text-gray-400 hover:bg-[#2b2b36] hover:text-gray-200'}`}
                         >
                           {s.name}
                         </button>

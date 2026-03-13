@@ -215,19 +215,24 @@ app.get('/api/episodes/servers/:episodeId', async (req, res) => {
 
         // Dynamic Standalone Embed Providers
         if (mal_id && ep) {
-            // Highly Reliable Mirrored Aggregators (Promoted to Primary for Stability)
-            servers.sub.unshift({ id: 'vidsrc-xyz', name: 'VidSrc (High Speed) ⚡', custom: true, type: 'iframe', link: `https://vidsrc.xyz/embed/anime/${mal_id}/${ep}` });
-            servers.sub.unshift({ id: 'vidlink-pro', name: 'MegaCloud (Global) 🌏', custom: true, type: 'iframe', link: `https://vidlink.pro/embed/anime/${mal_id}/${ep}` });
-            servers.sub.push({ id: 'vidsrc-cc', name: 'T-Cloud (Premium) 🔥', custom: true, type: 'iframe', link: `https://vidsrc.cc/v2/embed/anime/${mal_id}/${ep}/sub` });
-            
-            servers.dub.unshift({ id: 'vidsrc-cc-dub', name: 'MegaCloud (Dub) 🔥', custom: true, type: 'iframe', link: `https://vidsrc.cc/v2/embed/anime/${mal_id}/${ep}/dub` });
-            
-            // Mirror Backup section
-            if (!servers.extra) servers.extra = [];
-            servers.extra.push({ id: 'vidsrc-to', name: 'Mirror 1 💎', custom: true, type: 'iframe', link: `https://vidsrc.to/embed/anime/${mal_id}/${ep}` });
-            servers.extra.push({ id: 'vidsrc-me', name: 'Mirror 2 💎', custom: true, type: 'iframe', link: `https://vidsrc.me/embed/anime/${mal_id}/${ep}` });
-            servers.extra.push({ id: 'vidsrc-icu', name: 'Mirror 3 🧊', custom: true, type: 'iframe', link: `https://vidsrc.icu/embed/anime/${mal_id}/${ep}` });
-            servers.extra.push({ id: 'vidsrc-pm', name: 'Mirror 4 🚀', custom: true, type: 'iframe', link: `https://vidsrc.pm/embed/anime/${mal_id}/${ep}` });
+            // Clear extra servers completely so only Sub/Dub show up
+            servers.extra = [];
+
+            // Aniwatch-style SUB Servers 
+            const newSub = [
+                { id: 'vidsrc-sub', name: 'VidSrc', custom: true, type: 'iframe', link: `https://vidsrc.cc/v2/embed/anime/${mal_id}/${ep}/sub` },
+                { id: 'megacloud-sub', name: 'MegaCloud', custom: true, type: 'iframe', link: `https://vidsrc.xyz/embed/anime/${mal_id}/${ep}` },
+                { id: 'tcloud-sub', name: 'T-Cloud', custom: true, type: 'iframe', link: `https://vidlink.pro/embed/anime/${mal_id}/${ep}` }
+            ];
+            servers.sub = [...newSub, ...servers.sub];
+
+            // Aniwatch-style DUB Servers
+            const newDub = [
+                { id: 'vidsrc-dub', name: 'VidSrc', custom: true, type: 'iframe', link: `https://vidsrc.cc/v2/embed/anime/${mal_id}/${ep}/dub` },
+                { id: 'megacloud-dub', name: 'MegaCloud', custom: true, type: 'iframe', link: `https://vidsrc.me/embed/anime/${mal_id}/${ep}` },
+                { id: 'tcloud-dub', name: 'T-Cloud', custom: true, type: 'iframe', link: `https://vidsrc.icu/embed/anime/${mal_id}/${ep}` }
+            ];
+            servers.dub = [...newDub, ...servers.dub];
         }
         res.json(servers);
     } catch (err) {
