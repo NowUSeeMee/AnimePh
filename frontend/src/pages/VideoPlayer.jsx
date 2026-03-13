@@ -244,7 +244,25 @@ function VideoPlayer() {
                   </div>
                 )}
 
-                {/* All Servers rendered dynamically */}
+                {/* EXTRA / Mirror Servers */}
+                {servers.extra && servers.extra.length > 0 && (
+                  <div className="flex items-center gap-4">
+                    <span className="flex items-center gap-1.5 text-[10px] font-black text-anime-muted uppercase tracking-widest min-w-[45px]">
+                      <FiSettings className="text-anime-secondary" /> MISC:
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {servers.extra.map((s) => (
+                        <button
+                          key={s.id}
+                          onClick={() => { setSelectedType('extra'); handleServerChange(s); }}
+                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === s.id ? 'bg-anime-primary/20 border-anime-primary text-anime-primary shadow-[0_0_15px_rgba(99,102,241,0.2)]' : 'bg-white/5 border-white/5 text-anime-muted hover:bg-white/10 hover:text-white'}`}
+                        >
+                          {s.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
               </div>
 

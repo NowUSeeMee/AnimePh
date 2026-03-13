@@ -215,10 +215,20 @@ app.get('/api/episodes/servers/:episodeId', async (req, res) => {
 
         // Dynamic Standalone Embed Providers
         if (mal_id && ep) {
-            servers.sub.push({ id: 'vidsrc-to', name: 'Vidsrc.to ⚡', custom: true, type: 'iframe', link: `https://vidsrc.to/embed/anime/${mal_id}/${ep}` });
-            servers.sub.push({ id: 'vidsrc-me', name: 'Vidsrc.me 💎', custom: true, type: 'iframe', link: `https://vidsrc.me/embed/anime/${mal_id}/${ep}` });
+            if (!servers.extra) servers.extra = [];
+
+            // Highly Reliable Mirrored Aggregators
+            servers.extra.push({ id: 'vidsrc-xyz', name: 'Premium (High Speed) ⚡', custom: true, type: 'iframe', link: `https://vidsrc.xyz/embed/anime/${mal_id}/${ep}` });
+            servers.extra.push({ id: 'vidlink-pro', name: 'Global (Multi-Source) 🌏', custom: true, type: 'iframe', link: `https://vidlink.pro/embed/anime/${mal_id}/${ep}` });
+            
             servers.sub.push({ id: 'vidsrc-cc', name: 'Vidsrc.cc 🔥', custom: true, type: 'iframe', link: `https://vidsrc.cc/v2/embed/anime/${mal_id}/${ep}/sub` });
             servers.dub.push({ id: 'vidsrc-cc-dub', name: 'Vidsrc.cc (Dub) 🔥', custom: true, type: 'iframe', link: `https://vidsrc.cc/v2/embed/anime/${mal_id}/${ep}/dub` });
+            
+            // Fallback Mirrors
+            servers.extra.push({ id: 'vidsrc-to', name: 'Mirror 1 💎', custom: true, type: 'iframe', link: `https://vidsrc.to/embed/anime/${mal_id}/${ep}` });
+            servers.extra.push({ id: 'vidsrc-me', name: 'Mirror 2 💎', custom: true, type: 'iframe', link: `https://vidsrc.me/embed/anime/${mal_id}/${ep}` });
+            servers.extra.push({ id: 'vidsrc-icu', name: 'Mirror 3 🧊', custom: true, type: 'iframe', link: `https://vidsrc.icu/embed/anime/${mal_id}/${ep}` });
+            servers.extra.push({ id: 'vidsrc-pm', name: 'Mirror 4 🚀', custom: true, type: 'iframe', link: `https://vidsrc.pm/embed/anime/${mal_id}/${ep}` });
         }
         res.json(servers);
     } catch (err) {
