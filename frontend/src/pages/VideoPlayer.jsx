@@ -182,6 +182,15 @@ function VideoPlayer() {
               </div>
             )}
 
+            {/* Troubleshooting Overlay for 3rd Party Errors */}
+            {iframeUrl && !playerLoading && (
+              <div className="absolute bottom-4 right-4 z-30 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="bg-black/80 backdrop-blur-md px-4 py-2 rounded-xl text-[10px] font-medium border border-white/10 text-white/70 flex items-center gap-2">
+                   <FiSettings className="animate-spin-slow" /> Seeing "We're Sorry"? Try switching to <b>Mirror 2</b> or <b>High Speed</b> below.
+                </div>
+              </div>
+            )}
+
             {playerLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md z-20">
                 <div className="relative">
