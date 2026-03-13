@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-anime-bg text-anime-text font-sans antialiased overflow-x-hidden;
+  }
+}
+
+@layer components {
+  /* Dynamic Glassmorphism Card styling */
+  .glass-card {
+    @apply bg-anime-card/80 backdrop-blur-md border border-white/5 rounded-xl;
+  }
+  
+  /* Vibrant Button */
+  .btn-primary {
+    @apply bg-gradient-to-r from-anime-primary to-anime-accent hover:from-anime-accent hover:to-anime-primary text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,0.3)] hover:shadow-[0_0_20px_rgba(139,92,246,0.6)];
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)];
+  }
+
+  /* Swiper Carousel Customs */
+  .swiper-button-next,
+  .swiper-button-prev {
+    @apply bg-black/60 backdrop-blur-md text-white w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border border-white/10 hover:bg-anime-primary/80 hover:scale-110 !important;
+  }
+  
+  .swiper-button-next::after,
+  .swiper-button-prev::after {
+    font-size: 14px !important;
+    font-weight: 900 !important;
+  }
+  
+  .swiper-button-disabled {
+    opacity: 0 !important;
+  }
+
+  /* Swiper Pagination */
+  .swiper-pagination-bullet {
+    @apply bg-white/40 w-2.5 h-2.5 transition-all duration-300 border border-black/20 opacity-100 !important;
+  }
+  .swiper-pagination-bullet-active {
+    @apply bg-anime-primary w-8 rounded-full shadow-[0_0_10px_rgba(236,72,153,0.8)] !important;
+  }
+
+  /* Specific Hero Pagination Positioning to align with text */
+  .hero-swiper .swiper-pagination {
+    bottom: 140px !important;
+    text-align: left !important;
+    padding-left: 1rem !important;
+  }
+  @media (min-width: 640px) {
+    .hero-swiper .swiper-pagination { padding-left: 2rem !important; }
+  }
+  @media (min-width: 768px) {
+    .hero-swiper .swiper-pagination {
+      bottom: 240px !important;
+      padding-left: 4rem !important;
+    }
+  }
+  @media (min-width: 1024px) {
+    .hero-swiper .swiper-pagination { padding-left: 6rem !important; }
+  }
+}
+
