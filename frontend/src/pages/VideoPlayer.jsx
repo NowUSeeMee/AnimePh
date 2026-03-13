@@ -278,6 +278,18 @@ function VideoPlayer() {
                     <button
                       onClick={() => {
                         setSelectedType('mix');
+                        const s = { id: 'vidlink', name: 'VidLink ✨ (Best)', custom: true, link: `https://vidlink.pro/embed/anime/${id}/${ep}` };
+                        setSelectedServer(s);
+                        setIframeUrl(s.link);
+                        setPlayerLoading(true);
+                      }}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === 'vidlink' ? 'bg-anime-primary/20 border-anime-primary text-anime-primary' : 'bg-white/5 border-white/5 text-anime-muted hover:bg-white/10 hover:text-white'}`}
+                    >
+                      VidLink
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedType('mix');
                         const s = { id: 'megacloud', name: 'MegaCloud ☁️', custom: true, link: `https://vidsrc.xyz/embed/anime/${id}/${ep}` };
                         setSelectedServer(s);
                         setIframeUrl(s.link);
@@ -290,7 +302,7 @@ function VideoPlayer() {
                     <button
                       onClick={() => {
                         setSelectedType('mix');
-                        const s = { id: 't-cloud', name: 'T-Cloud ⚡', custom: true, link: `https://vidsrc.icu/embed/anime/${id}/${ep}` };
+                        const s = { id: 't-cloud', name: 'T-Cloud ⚡', custom: true, link: `https://vidsrc.me/embed/anime/${id}/${ep}` };
                         setSelectedServer(s);
                         setIframeUrl(s.link);
                         setPlayerLoading(true);
@@ -304,9 +316,12 @@ function VideoPlayer() {
                       className="px-4 py-2 rounded-xl text-xs font-bold transition-all border bg-anime-secondary/10 border-anime-secondary text-anime-secondary hover:bg-anime-secondary/20"
                       title="Open in new tab if video doesn't load"
                     >
-                      <FiExternalLink className="inline mr-1" /> Mirror Link
+                      <FiExternalLink className="inline mr-1" /> Popout
                     </button>
                   </div>
+                </div>
+                <div className="text-[10px] text-anime-muted italic opacity-60">
+                  Note: If a server shows "Unavailable", try another mirror or use the Popout button. Some upcoming shows may not have mirrors ready yet.
                 </div>
               </div>
 
