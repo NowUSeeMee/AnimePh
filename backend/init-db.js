@@ -1,6 +1,7 @@
 const mysql = require('mysql2/promise');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 async function initDB() {
     try {
@@ -10,6 +11,7 @@ async function initDB() {
             port: process.env.DB_PORT || 3306,
             user: process.env.DB_USER || 'root',
             password: process.env.DB_PASSWORD || '',
+            database: process.env.DB_NAME || 'defaultdb',
             multipleStatements: true,
             ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : null
         });

@@ -276,7 +276,7 @@ function VideoPlayer() {
                     <button
                       onClick={() => {
                         setSelectedType('mix');
-                        const s = { id: 'megacloud', name: 'MegaCloud ☁️', custom: true, link: `https://vidsrc.me/embed/anime/${id}/${ep}?server=megacloud` };
+                        const s = { id: 'megacloud', name: 'MegaCloud ☁️', custom: true, link: `https://vidsrc.cc/v2/embed/anime/${id}/${ep}/sub?server=megacloud` };
                         setSelectedServer(s);
                         setIframeUrl(s.link);
                         setPlayerLoading(true);
@@ -288,7 +288,7 @@ function VideoPlayer() {
                     <button
                       onClick={() => {
                         setSelectedType('mix');
-                        const s = { id: 't-cloud', name: 'T-Cloud ⚡', custom: true, link: `https://vidsrc.me/embed/anime/${id}/${ep}?server=upcloud` };
+                        const s = { id: 't-cloud', name: 'T-Cloud ⚡', custom: true, link: `https://vidsrc.cc/v2/embed/anime/${id}/${ep}/sub?server=upcloud` };
                         setSelectedServer(s);
                         setIframeUrl(s.link);
                         setPlayerLoading(true);
