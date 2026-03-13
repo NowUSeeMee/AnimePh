@@ -6,12 +6,19 @@ export default defineConfig({
   plugins: [react()],
   build: {
     target: 'esnext',
-    minify: 'esbuild',
+    minify: 'terser',
+    terserOptions: {
+        compress: {
+            drop_console: true,
+            drop_debugger: true
+        }
+    },
     rollupOptions: {
       output: {
         manualChunks: {
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-ui': ['react-icons', 'swiper'],
+          'vendor-ui': ['react-icons', 'swiper', 'react-intersection-observer'],
+          'vendor-utils': ['axios'],
         },
       },
     },

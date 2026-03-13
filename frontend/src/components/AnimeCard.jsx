@@ -3,14 +3,14 @@ import { Link } from 'react-router-dom';
 import { FiStar } from 'react-icons/fi';
 
 const AnimeCard = memo(({ anime }) => {
-  // Get the highest quality image available from the API
+  // Get the most optimized image size for a thumbnail card
   const getMaxImage = () => {
     const imgs = anime.images;
-    // Prefer WebP for best quality-to-size ratio, then JPG
-    return imgs?.webp?.large_image_url 
-      || imgs?.jpg?.large_image_url 
-      || imgs?.webp?.image_url 
+    // Prefer small webp for thumbnails to drastically improve load time and scrolling lag
+    return imgs?.webp?.image_url 
       || imgs?.jpg?.image_url 
+      || imgs?.webp?.large_image_url 
+      || imgs?.jpg?.large_image_url 
       || 'https://via.placeholder.com/225x318?text=No+Image';
   };
 

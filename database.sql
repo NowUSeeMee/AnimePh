@@ -1,4 +1,7 @@
--- Tables Initialization
+-- Create database
+CREATE DATABASE IF NOT EXISTS animeph;
+USE animeph;
+
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -65,6 +68,12 @@ CREATE TABLE IF NOT EXISTS watch_history (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (anime_id) REFERENCES anime(mal_id) ON DELETE CASCADE
 );
+
+-- Optimization Indexes
+CREATE INDEX idx_anime_title ON anime(title);
+CREATE INDEX idx_episodes_anime_id ON episodes(anime_id);
+CREATE INDEX idx_favorites_user_id ON favorites(user_id);
+CREATE INDEX idx_history_user_id ON watch_history(user_id);
 
 -- Insert demo user
 INSERT IGNORE INTO users (id, username) VALUES (1, 'demo_user');

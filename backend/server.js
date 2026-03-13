@@ -2,16 +2,14 @@ require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
+const compression = require('compression');
 const { scrapeEpisodesForTitle, fetchServers, fetchSources } = require('./scraper');
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true
-}));
+app.use(compression());
+app.use(cors());
 app.use(express.json());
 
 // Health check routes
@@ -35,15 +33,13 @@ app.get('/api', (req, res) => {
 // MySQL Database connection pool
 const db = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'animeph',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    multipleStatements: true,
-    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : null
+    multipleStatements: true
 });
 
 // Middleware to ensure anime is cached in our DB
@@ -204,7 +200,22 @@ app.get('/api/episodes/:id', async (req, res) => {
 // GET: Servers for an episode
 app.get('/api/episodes/servers/:episodeId', async (req, res) => {
     try {
+        const { mal_id, ep } = req.query;
+        // Scraper Servers First
         const servers = await fetchServers(req.params.episodeId);
+        
+        // Ensure sub/dub arrays exist
+        if (!servers.sub) servers.sub = [];
+        if (!servers.dub) servers.dub = [];
+        if (!servers.mix) servers.mix = [];
+
+        // Dynamic Standalone Embed Providers
+        if (mal_id && ep) {
+            servers.sub.push({ id: 'vidsrc-to', name: 'Vidsrc.to ⚡', custom: true, type: 'iframe', link: `https://vidsrc.to/embed/anime/${mal_id}/${ep}` });
+            servers.sub.push({ id: 'vidsrc-me', name: 'Vidsrc.me 💎', custom: true, type: 'iframe', link: `https://vidsrc.me/embed/anime/${mal_id}/${ep}` });
+            servers.sub.push({ id: 'vidsrc-cc', name: 'Vidsrc.cc 🔥', custom: true, type: 'iframe', link: `https://vidsrc.cc/v2/embed/anime/${mal_id}/${ep}/sub` });
+            servers.dub.push({ id: 'vidsrc-cc-dub', name: 'Vidsrc.cc (Dub) 🔥', custom: true, type: 'iframe', link: `https://vidsrc.cc/v2/embed/anime/${mal_id}/${ep}/dub` });
+        }
         res.json(servers);
     } catch (err) {
         res.status(500).json({ error: err.message });

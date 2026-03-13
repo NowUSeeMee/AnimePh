@@ -55,6 +55,14 @@ function VideoPlayer() {
   const handleServerChange = useCallback(async (server) => {
     setSelectedServer(server);
     setPlayerLoading(true);
+    
+    // If it's a custom iframe server (like VidSrc), just set the link directly
+    if (server.custom && server.type === 'iframe') {
+       setIframeUrl(server.link);
+       return;
+    }
+
+    // Otherwise, it's a scraped server that needs its source fetched
     try {
       const res = await watchAPI.getSource(server.id);
       if (res.data && res.data.link) {
@@ -62,12 +70,16 @@ function VideoPlayer() {
       } else {
         setIframeUrl(null);
       }
-      // Trigger Vercel redeploy with valid author
     } catch (err) {
       console.error('Source fetch error:', err);
       setIframeUrl(null);
     } finally {
-      setPlayerLoading(false);
+      // The iframe onLoad event will setPlayerLoading(false) for custom links,
+      // but for direct fetches we might need to handle it differently if it's not an iframe.
+      // Assuming watchAPI.getSource also returns an iframe link.
+      if (!server.custom) {
+         setPlayerLoading(false); 
+      }
     }
   }, []);
 
@@ -75,7 +87,8 @@ function VideoPlayer() {
     setPlayerLoading(true);
     setIframeUrl(null);
     try {
-      const res = await watchAPI.getServers(episodeId);
+      // Pass the anime MAL ID and Episode number to the backend
+      const res = await watchAPI.getServers(episodeId, id, ep);
       const serverData = res.data;
       setServers(serverData);
       
@@ -92,7 +105,7 @@ function VideoPlayer() {
       console.error('Server fetch error:', err);
       setPlayerLoading(false);
     }
-  }, [handleServerChange]);
+  }, [handleServerChange, id, ep]);
 
   const logHistory = useCallback(async () => {
     if (!anime) return;
@@ -158,10 +171,8 @@ function VideoPlayer() {
                 allowFullScreen
                 frameBorder="0"
                 scrolling="no"
-                referrerPolicy="no-referrer"
-                sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
                 onLoad={() => setPlayerLoading(false)}
-              ></iframe>
+              />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-black/60 backdrop-blur-3xl">
                 <FiPlay className="text-6xl text-anime-primary mb-4 animate-pulse" />
@@ -233,96 +244,8 @@ function VideoPlayer() {
                   </div>
                 )}
 
-                {/* Stable / Fallback Sources */}
-                <div className="flex items-center gap-4 border-t border-white/5 pt-4 mt-2">
-                  <span className="flex items-center gap-1.5 text-[10px] font-black text-anime-primary uppercase tracking-widest min-w-[55px]">
-                    <FiSettings className="animate-spin-slow" /> STABLE:
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => {
-                        setSelectedType('mix');
-                        const s = { id: 'vidsrc-to', name: 'Vidsrc.to ⚡', custom: true, link: `https://vidsrc.to/embed/anime/${id}/${ep}` };
-                        setSelectedServer(s);
-                        setIframeUrl(s.link);
-                        setPlayerLoading(true);
-                      }}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === 'vidsrc-to' ? 'bg-anime-primary/20 border-anime-primary text-anime-primary' : 'bg-white/5 border-white/5 text-anime-muted hover:bg-white/10 hover:text-white'}`}
-                    >
-                      Vidsrc.to
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSelectedType('mix');
-                        const s = { id: 'vidsrc-me', name: 'Vidsrc.me 💎', custom: true, link: `https://vidsrc.me/embed/anime/${id}/${ep}` };
-                        setSelectedServer(s);
-                        setIframeUrl(s.link);
-                        setPlayerLoading(true);
-                      }}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === 'vidsrc-me' ? 'bg-anime-primary/20 border-anime-primary text-anime-primary' : 'bg-white/5 border-white/5 text-anime-muted hover:bg-white/10 hover:text-white'}`}
-                    >
-                      Vidsrc.me
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSelectedType('mix');
-                        const s = { id: 'vidsrc-cc', name: 'Vidsrc.cc 🔥', custom: true, link: `https://vidsrc.cc/v2/embed/anime/${id}/${ep}/sub` };
-                        setSelectedServer(s);
-                        setIframeUrl(s.link);
-                        setPlayerLoading(true);
-                      }}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === 'vidsrc-cc' ? 'bg-anime-primary/20 border-anime-primary text-anime-primary' : 'bg-white/5 border-white/5 text-anime-muted hover:bg-white/10 hover:text-white'}`}
-                    >
-                      Vidsrc.cc
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSelectedType('mix');
-                        const s = { id: 'vidlink', name: 'VidLink ✨ (Best)', custom: true, link: `https://vidlink.pro/embed/anime/${id}/${ep}` };
-                        setSelectedServer(s);
-                        setIframeUrl(s.link);
-                        setPlayerLoading(true);
-                      }}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === 'vidlink' ? 'bg-anime-primary/20 border-anime-primary text-anime-primary' : 'bg-white/5 border-white/5 text-anime-muted hover:bg-white/10 hover:text-white'}`}
-                    >
-                      VidLink
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSelectedType('mix');
-                        const s = { id: 'megacloud', name: 'MegaCloud ☁️', custom: true, link: `https://vidsrc.xyz/embed/anime/${id}/${ep}` };
-                        setSelectedServer(s);
-                        setIframeUrl(s.link);
-                        setPlayerLoading(true);
-                      }}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === 'megacloud' ? 'bg-anime-primary/20 border-anime-primary text-anime-primary' : 'bg-white/5 border-white/5 text-anime-muted hover:bg-white/10 hover:text-white'}`}
-                    >
-                      MegaCloud
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSelectedType('mix');
-                        const s = { id: 't-cloud', name: 'T-Cloud ⚡', custom: true, link: `https://vidsrc.me/embed/anime/${id}/${ep}` };
-                        setSelectedServer(s);
-                        setIframeUrl(s.link);
-                        setPlayerLoading(true);
-                      }}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === 't-cloud' ? 'bg-anime-primary/20 border-anime-primary text-anime-primary' : 'bg-white/5 border-white/5 text-anime-muted hover:bg-white/10 hover:text-white'}`}
-                    >
-                      T-Cloud
-                    </button>
-                    <button
-                      onClick={() => window.open(iframeUrl, '_blank')}
-                      className="px-4 py-2 rounded-xl text-xs font-bold transition-all border bg-anime-secondary/10 border-anime-secondary text-anime-secondary hover:bg-anime-secondary/20"
-                      title="Open in new tab if video doesn't load"
-                    >
-                      <FiExternalLink className="inline mr-1" /> Popout
-                    </button>
-                  </div>
-                </div>
-                <div className="text-[10px] text-anime-muted italic opacity-60">
-                  Note: If a server shows "Unavailable", try another mirror or use the Popout button. Some upcoming shows may not have mirrors ready yet.
-                </div>
+                {/* All Servers rendered dynamically */}
+
               </div>
 
              <div className="flex gap-2 shrink-0 self-end sm:self-center">

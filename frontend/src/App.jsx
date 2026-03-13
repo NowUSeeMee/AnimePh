@@ -10,6 +10,7 @@ const Search = lazy(() => import('./pages/Search'));
 const AnimeDetails = lazy(() => import('./pages/AnimeDetails'));
 const MyWatchlist = lazy(() => import('./pages/MyWatchlist'));
 const VideoPlayer = lazy(() => import('./pages/VideoPlayer'));
+const Disclaimer = lazy(() => import('./pages/Disclaimer'));
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
               <Route path="/anime/:id" element={<AnimeDetails />} />
               <Route path="/watchlist" element={<MyWatchlist />} />
               <Route path="/watch/:id/:ep" element={<VideoPlayer />} />
+              <Route path="/disclaimer" element={<Disclaimer />} />
             </Routes>
           </Suspense>
         </main>
@@ -38,7 +40,10 @@ function App() {
               <img src="/logo1.png" alt="AnimePh Logo" className="w-12 h-12 object-contain group-hover:rotate-12 transition-transform duration-500" />
               <p className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-anime-primary to-anime-secondary">AnimePh</p>
             </div>
-            <p className="text-sm">© {new Date().getFullYear()} AnimePh. All rights reserved.</p>
+            <p className="text-sm mb-2">© {new Date().getFullYear()} AnimePh. All rights reserved.</p>
+            <a href="/disclaimer" className="text-xs text-anime-primary hover:text-anime-secondary transition-colors font-medium border-b border-transparent hover:border-anime-secondary">
+              DMCA & Copyright Disclaimer
+            </a>
           </div>
         </footer>
       </div>

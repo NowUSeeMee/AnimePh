@@ -4,6 +4,7 @@ import AnimeCard from '../components/AnimeCard';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { Link } from 'react-router-dom';
 import { FiStar } from 'react-icons/fi';
+import { useInView } from 'react-intersection-observer';
 
 // Swiper imports
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -74,6 +75,13 @@ function Home() {
   const [genreLoading, setGenreLoading] = useState(true);
   const [featureLoading, setFeatureLoading] = useState(true);
 
+  // Observers for lazy loading sections
+  const { ref: picksRef, inView: picksInView } = useInView({ triggerOnce: true, rootMargin: '200px' });
+  const { ref: scheduleRef, inView: scheduleInView } = useInView({ triggerOnce: true, rootMargin: '200px' });
+  const { ref: genreRef, inView: genreInView } = useInView({ triggerOnce: true, rootMargin: '200px' });
+  const { ref: featureRef, inView: featureInView } = useInView({ triggerOnce: true, rootMargin: '200px' });
+
+  // Initial Paint (Hero + Trending)
   useEffect(() => {
     const fetchHomeData = async () => {
       setLoading(true);
@@ -82,9 +90,7 @@ function Home() {
         if (trendingRes?.data?.data) {
           setTrendingAnime(filterUnique(trendingRes.data.data).slice(0, 21));
         }
-        
-        await new Promise(r => setTimeout(r, 1000));
-        
+        await new Promise(r => setTimeout(r, 800)); // Stagger slightly
         const topRes = await fetchWithRetry(() => animeAPI.getTopAnime());
         if (topRes?.data?.data) {
           setTopAnime(filterUnique(topRes.data.data).slice(0, 20));
@@ -95,58 +101,63 @@ function Home() {
         setLoading(false);
       }
     };
+    fetchHomeData();
+  }, []);
 
+  // Lazy Load: Top Picks
+  useEffect(() => {
+    if (!picksInView) return;
     const fetchTopPicks = async () => {
       setPicksLoading(true);
       try {
         const res = await fetchWithRetry(() => animeAPI.getTopPicksAnime());
-        if (res?.data?.data) {
-          setTopPicks(filterUnique(res.data.data).slice(0, 21));
-        }
+        if (res?.data?.data) setTopPicks(filterUnique(res.data.data).slice(0, 21));
       } catch (error) {
         console.error('Error fetching top picks:', error);
       } finally {
         setPicksLoading(false);
       }
     };
+    fetchTopPicks();
+  }, [picksInView]);
 
+  // Lazy Load: Schedule
+  useEffect(() => {
+    if (!scheduleInView) return;
     const fetchSchedule = async () => {
       setScheduleLoading(true);
       try {
         const todayDay = getDayName(0);
         const yesterdayDay = getDayName(-1);
-
         const todayRes = await fetchWithRetry(() => animeAPI.getSchedule(todayDay));
-        if (todayRes?.data?.data) {
-          setScheduleToday(filterUnique(todayRes.data.data).slice(0, 25));
-        }
-
-        await new Promise(r => setTimeout(r, 1500));
-
+        if (todayRes?.data?.data) setScheduleToday(filterUnique(todayRes.data.data).slice(0, 25));
+        
+        await new Promise(r => setTimeout(r, 1000)); // Stagger
         const yesterdayRes = await fetchWithRetry(() => animeAPI.getSchedule(yesterdayDay));
-        if (yesterdayRes?.data?.data) {
-          setScheduleYesterday(filterUnique(yesterdayRes.data.data).slice(0, 25));
-        }
+        if (yesterdayRes?.data?.data) setScheduleYesterday(filterUnique(yesterdayRes.data.data).slice(0, 25));
       } catch (error) {
         console.error('Error fetching schedule:', error);
       } finally {
         setScheduleLoading(false);
       }
     };
+    fetchSchedule();
+  }, [scheduleInView]);
 
+  // Lazy Load: Genres
+  useEffect(() => {
+    if (!genreInView) return;
     const fetchGenreData = async () => {
       setGenreLoading(true);
       try {
         const advRes = await fetchWithRetry(() => animeAPI.getGenreAnime(2));
         if (advRes?.data?.data) setAdventureAnime(filterUnique(advRes.data.data).slice(0, 14));
         
-        await new Promise(r => setTimeout(r, 1500));
-        
+        await new Promise(r => setTimeout(r, 1000));
         const romRes = await fetchWithRetry(() => animeAPI.getGenreAnime(22));
         if (romRes?.data?.data) setRomanceAnime(filterUnique(romRes.data.data).slice(0, 14));
         
-        await new Promise(r => setTimeout(r, 1500));
-        
+        await new Promise(r => setTimeout(r, 1000));
         const fanRes = await fetchWithRetry(() => animeAPI.getGenreAnime(10));
         if (fanRes?.data?.data) setFantasyAnime(filterUnique(fanRes.data.data).slice(0, 14));
       } catch (error) {
@@ -155,20 +166,23 @@ function Home() {
         setGenreLoading(false);
       }
     };
+    fetchGenreData();
+  }, [genreInView]);
 
+  // Lazy Load: Features (New, Mature, Upcoming)
+  useEffect(() => {
+    if (!featureInView) return;
     const fetchFeatureData = async () => {
       setFeatureLoading(true);
       try {
         const newRes = await fetchWithRetry(() => animeAPI.getNewAnime());
         if (newRes?.data?.data) setNewAnime(filterUnique(newRes.data.data).slice(0, 14));
         
-        await new Promise(r => setTimeout(r, 2000));
-        
+        await new Promise(r => setTimeout(r, 1000));
         const matureRes = await fetchWithRetry(() => animeAPI.getMatureAnime());
         if (matureRes?.data?.data) setMatureAnime(filterUnique(matureRes.data.data).slice(0, 14));
 
-        await new Promise(r => setTimeout(r, 2000));
-
+        await new Promise(r => setTimeout(r, 1000));
         const upcomingRes = await fetchWithRetry(() => animeAPI.getUpcomingAnime());
         if (upcomingRes?.data?.data) setUpcomingAnime(filterUnique(upcomingRes.data.data).slice(0, 8));
       } catch (error) {
@@ -177,20 +191,8 @@ function Home() {
         setFeatureLoading(false);
       }
     };
-
-    fetchHomeData();
-    const t1 = setTimeout(() => fetchTopPicks(), 3000);
-    const t2 = setTimeout(() => fetchSchedule(), 6000);
-    const t3 = setTimeout(() => fetchGenreData(), 10000);
-    const t4 = setTimeout(() => fetchFeatureData(), 16000);
-
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-      clearTimeout(t4);
-    };
-  }, []);
+    fetchFeatureData();
+  }, [featureInView]);
 
   const getHeroImage = useCallback((anime) => {
     let ytId = anime.trailer?.youtube_id;
@@ -390,13 +392,13 @@ function Home() {
       </section>
 
       {/* Top Picks For You */}
-      <section className="px-4 md:px-8 mt-16 md:mt-24">
+      <section ref={picksRef} className="px-4 md:px-8 mt-16 md:mt-24">
         <div className="flex items-center justify-between mb-6 px-1">
           <h2 className="text-2xl font-bold flex items-center gap-3 drop-shadow-lg text-white">
             Top Picks For You <span className="text-amber-400 text-lg">✨</span>
           </h2>
         </div>
-        <div className="relative mx-[-8px] px-[8px]">
+        <div className="relative mx-[-8px] px-[8px] min-h-[220px]">
           {picksLoading ? (
             <div className="flex gap-4 overflow-hidden">
               {[1, 2, 3, 4, 5, 6, 7].map(i => (
@@ -413,7 +415,7 @@ function Home() {
               navigation={true}
               freeMode={true}
               grabCursor={true}
-              autoplay={{ delay: 5000, disableOnInteraction: false }}
+              autoplay={{ delay: 5000, disableOnInteraction: false, pauseOnMouseEnter: true }}
               breakpoints={{
                 640: { slidesPerView: 3 },
                 768: { slidesPerView: 4 },
@@ -473,13 +475,13 @@ function Home() {
       </section>
 
       {/* Trending Adventure */}
-      <section className="px-4 md:px-8 mt-16 md:mt-24">
+      <section ref={genreRef} className="px-4 md:px-8 mt-16 md:mt-24">
         <div className="flex items-center justify-between mb-6 px-1">
           <h2 className="text-2xl font-bold flex items-center gap-3 drop-shadow-lg text-white">
             Trending Adventure Anime <span className="text-orange-400 text-lg">⚔️</span>
           </h2>
         </div>
-        <div className="relative mx-[-8px] px-[8px]">
+        <div className="relative mx-[-8px] px-[8px] min-h-[220px]">
           {genreLoading ? (
             <div className="flex gap-4 overflow-hidden">
               {[1, 2, 3, 4, 5, 6, 7].map(i => (
@@ -490,7 +492,7 @@ function Home() {
             </div>
           ) : (
             <Swiper
-              modules={[Navigation, Autoplay, FreeMode]}
+              modules={[Navigation, FreeMode]}
               spaceBetween={20}
               slidesPerView={2}
               navigation={true}
@@ -602,13 +604,13 @@ function Home() {
       </section>
 
       {/* New On AnimePh */}
-      <section className="px-4 md:px-8 mt-16 md:mt-24">
+      <section ref={featureRef} className="px-4 md:px-8 mt-16 md:mt-24">
         <div className="flex items-center justify-between mb-6 px-1">
           <h2 className="text-2xl font-bold flex items-center gap-3 drop-shadow-lg text-white">
             New On AnimePh <span className="text-cyan-400 text-lg">🆕</span>
           </h2>
         </div>
-        <div className="relative mx-[-8px] px-[8px]">
+        <div className="relative mx-[-8px] px-[8px] min-h-[220px]">
           {featureLoading ? (
             <div className="flex gap-4 overflow-hidden">
               {[1, 2, 3, 4, 5, 6, 7].map(i => (
@@ -619,7 +621,7 @@ function Home() {
             </div>
           ) : (
             <Swiper
-              modules={[Navigation, Autoplay, FreeMode]}
+              modules={[Navigation, FreeMode]}
               spaceBetween={20}
               slidesPerView={2}
               navigation={true}
@@ -689,7 +691,7 @@ function Home() {
       </section>
 
       {/* New Episodes & Top Upcoming Side-by-Side */}
-      <section className="px-4 md:px-8 mt-16 md:mt-24 mb-24">
+      <section ref={scheduleRef} className="px-4 md:px-8 mt-16 md:mt-24 mb-24">
         <div className="flex flex-col xl:flex-row gap-8">
           
           {/* Left Column: New Episodes */}

@@ -28,7 +28,7 @@ export const animeAPI = {
 // Standalone export to bypass Vite HMR object mutation issues
 export const fetchAnimeRelations = (id) => api.get(`/anime/${id}/relations`);
 
-// Backend API (Our Express Server)
+// Backend API (Our Express Server on Render or Local)
 const BACKEND_BASEURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const backendAPI = axios.create({
@@ -36,6 +36,6 @@ export const backendAPI = axios.create({
 });
 
 export const watchAPI = {
-  getServers: (episodeId) => backendAPI.get(`/episodes/servers/${episodeId}`),
+  getServers: (episodeId, malId, ep) => backendAPI.get(`/episodes/servers/${episodeId}?mal_id=${malId}&ep=${ep}`),
   getSource: (serverId) => backendAPI.get(`/episodes/sources/${serverId}`),
 };
