@@ -290,7 +290,7 @@ function VideoPlayer() {
                     <button
                       onClick={() => {
                         setSelectedType('mix');
-                        const s = { id: 't-cloud', name: 'T-Cloud ⚡', custom: true, link: `https://v2.vidsrc.me/embed/anime/${id}/${ep}` };
+                        const s = { id: 't-cloud', name: 'T-Cloud ⚡', custom: true, link: `https://vidsrc.icu/embed/anime/${id}/${ep}` };
                         setSelectedServer(s);
                         setIframeUrl(s.link);
                         setPlayerLoading(true);
@@ -298,6 +298,13 @@ function VideoPlayer() {
                       className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${selectedServer?.id === 't-cloud' ? 'bg-anime-primary/20 border-anime-primary text-anime-primary' : 'bg-white/5 border-white/5 text-anime-muted hover:bg-white/10 hover:text-white'}`}
                     >
                       T-Cloud
+                    </button>
+                    <button
+                      onClick={() => window.open(iframeUrl, '_blank')}
+                      className="px-4 py-2 rounded-xl text-xs font-bold transition-all border bg-anime-secondary/10 border-anime-secondary text-anime-secondary hover:bg-anime-secondary/20"
+                      title="Open in new tab if video doesn't load"
+                    >
+                      <FiExternalLink className="inline mr-1" /> Mirror Link
                     </button>
                   </div>
                 </div>
