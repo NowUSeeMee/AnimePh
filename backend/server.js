@@ -21,8 +21,8 @@ app.get('/api', (req, res) => {
     res.json({ 
         status: 'online', 
         message: 'AnimePh API is active',
-        version: '1.2.0',
-        last_updated: '2026-03-13T23:50:00Z',
+        version: '1.2.5',
+        last_updated: '2026-03-14T17:05:00Z',
         endpoints: [
             '/api/favorites',
             '/api/episodes/:id',
@@ -112,7 +112,12 @@ app.get('/api/episodes/:id', async (req, res) => {
         console.log(`[Backend] Episode request received for MAL ID: ${malId}, Title: ${title}, English: ${titleEnglish}`);
         
         // 1. Check if we already have episodes cached in DB using the MAL ID
-        const [rows] = await db.query('SELECT * FROM episodes WHERE anime_id = ? ORDER BY episode_number ASC', [malId]);
+        let rows = [];
+        try {
+            [rows] = await db.query('SELECT * FROM episodes WHERE anime_id = ? ORDER BY episode_number ASC', [malId]);
+        } catch (dbErr) {
+            console.error('[Backend] DB Query Error (Falling back to scraper):', dbErr.message);
+        }
         
         if (rows.length > 0) {
             console.log(`[Backend] Returning ${rows.length} cached episodes for MAL ID ${malId}`);
@@ -170,31 +175,29 @@ app.get('/api/episodes/:id', async (req, res) => {
             return res.status(404).json({ error: "No episodes found from scraper." });
         }
 
-        // 3. Ensure the anime record exists before inserting episodes (foreign key)
-        const [existingAnime] = await db.query('SELECT mal_id FROM anime WHERE mal_id = ?', [malId]);
-        if (existingAnime.length === 0) {
+        // 3. Optional: Save to DB in background
+        try {
+            const [existingAnime] = await db.query('SELECT mal_id FROM anime WHERE mal_id = ?', [malId]);
+            if (existingAnime.length === 0) {
+                await db.query(
+                    'INSERT IGNORE INTO anime (mal_id, title, title_english) VALUES (?, ?, ?)',
+                    [malId, title, titleEnglish || null]
+                );
+            }
+
+            const values = scrapedEpisodes.map(ep => [
+                malId, ep.episode_number, ep.title, ep.link, ep.data_id
+            ]);
+
             await db.query(
-                'INSERT IGNORE INTO anime (mal_id, title, title_english) VALUES (?, ?, ?)',
-                [malId, title, titleEnglish || null]
+                'INSERT IGNORE INTO episodes (anime_id, episode_number, title, link, data_id) VALUES ?',
+                [values]
             );
-            console.log(`[Backend] Auto-cached anime record for MAL ID ${malId}`);
+            console.log(`[Backend] Saved ${scrapedEpisodes.length} episodes to database for MAL ID ${malId}`);
+        } catch (dbErr) {
+            console.warn('[Backend] Could not cache to DB:', dbErr.message);
         }
 
-        // 4. Save scraped episodes to database using the MAL ID as the anime_id foreign key
-        const values = scrapedEpisodes.map(ep => [
-            malId,
-            ep.episode_number,
-            ep.title,
-            ep.link,
-            ep.data_id
-        ]);
-
-        await db.query(
-            'INSERT IGNORE INTO episodes (anime_id, episode_number, title, link, data_id) VALUES ?',
-            [values]
-        );
-
-        console.log(`[Backend] Saved ${scrapedEpisodes.length} episodes to database for MAL ID ${malId}`);
         res.json(scrapedEpisodes);
 
     } catch (err) {

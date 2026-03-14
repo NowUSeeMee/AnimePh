@@ -177,8 +177,12 @@ function VideoPlayer() {
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-black/60 backdrop-blur-3xl">
                 <FiPlay className="text-6xl text-anime-primary mb-4 animate-pulse" />
-                <h2 className="text-xl font-bold mb-2">No player source available</h2>
-                <p className="text-anime-muted text-sm max-w-sm">Please try switching to another server or checking back later.</p>
+                <h2 className="text-xl font-bold mb-2">{episodes.length === 0 ? "Scraping Media Sources..." : "No player source available"}</h2>
+                <p className="text-anime-muted text-sm max-w-sm">
+                  {episodes.length === 0 
+                    ? "We are currently looking for available streams. This might take a few seconds." 
+                    : "Please try switching to another server or checking back later."}
+                </p>
               </div>
             )}
 
@@ -274,7 +278,7 @@ function VideoPlayer() {
                 
                 {/* Deployment Sync Check Hint */}
                 <div className="text-[9px] text-white/20 mt-2 flex justify-between items-center tabular-nums">
-                  <span>API v1.2.0 • If mirrors are missing, please hard-refresh (Ctrl+F5)</span>
+                    <span>API v1.2.5 • If mirrors are missing, please hard-refresh (Ctrl+F5)</span>
                 </div>
               </div>
 
