@@ -232,6 +232,11 @@ app.get('/api/episodes/servers/:episodeId', async (req, res) => {
             addUniqueServer(servers.extra, { id: 'vidsrc-xyz', name: 'VidSrc (Main)', custom: true, type: 'iframe', link: `https://vidsrc.xyz/embed/anime/${mal_id}/${ep}` });
             addUniqueServer(servers.extra, { id: 'vidlink-pro', name: 'VidLink', custom: true, type: 'iframe', link: `https://vidlink.pro/embed/anime/${mal_id}/${ep}` });
             addUniqueServer(servers.extra, { id: 'embed-su', name: 'Ultra HD', custom: true, type: 'iframe', link: `https://embed.su/embed/anime/${mal_id}/${ep}` });
+            
+            // New Resilient Fallbacks
+            addUniqueServer(servers.extra, { id: 'vidsrc-cc', name: 'VidSrc-CC', custom: true, type: 'iframe', link: `https://vidsrc.cc/v2/embed/anime/${mal_id}/${ep}/sub` });
+            addUniqueServer(servers.extra, { id: 'vidsrc2-to', name: 'Server 2', custom: true, type: 'iframe', link: `https://vidsrc2.to/embed/anime/${mal_id}/${ep}` });
+            addUniqueServer(servers.extra, { id: 'multi-vidsrc', name: 'Multi-Src', custom: true, type: 'iframe', link: `https://vidsrc.in/embed/anime/${mal_id}/${ep}` });
         }
         res.json(servers);
     } catch (err) {
