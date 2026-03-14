@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: animeph-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: PORT
+        value: 5000
+      # You can create a secret group in Render and link it here
+      # or add individual DB_HOST, DB_USER, DB_PASSWORD, DB_NAME env vars

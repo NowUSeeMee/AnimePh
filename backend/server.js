@@ -213,9 +213,8 @@ app.get('/api/episodes/servers/:episodeId', async (req, res) => {
         // Ensure sub/dub arrays exist
         if (!servers.sub) servers.sub = [];
         if (!servers.dub) servers.dub = [];
-        if (!servers.mix) servers.mix = [];
 
-        // Dynamic Standalone Embed Providers
+        // Dynamic Standalone Embed Providers (Backup Mirrors)
         if (mal_id && ep) {
             if (!servers.extra) servers.extra = [];
 
@@ -226,22 +225,10 @@ app.get('/api/episodes/servers/:episodeId', async (req, res) => {
                 }
             };
 
-            // Highly Reliable Mirrored Aggregators
+            // Only add essential mirrors to avoid clutter
             addUniqueServer(servers.extra, { id: 'vidsrc-xyz', name: 'VidSrc (Main)', custom: true, type: 'iframe', link: `https://vidsrc.xyz/embed/anime/${mal_id}/${ep}` });
-            addUniqueServer(servers.extra, { id: 'vidlink-pro', name: 'VidLink (Global)', custom: true, type: 'iframe', link: `https://vidlink.pro/embed/anime/${mal_id}/${ep}` });
-            addUniqueServer(servers.extra, { id: 'vidsrc-net', name: 'VidSrc (Net)', custom: true, type: 'iframe', link: `https://vidsrc.net/embed/anime/${mal_id}/${ep}` });
-            
-            addUniqueServer(servers.sub, { id: 'vidsrc-cc', name: 'VidSrc-CC', custom: true, type: 'iframe', link: `https://vidsrc.cc/v2/embed/anime/${mal_id}/${ep}/sub` });
-            addUniqueServer(servers.dub, { id: 'vidsrc-cc-dub', name: 'VidSrc-CC', custom: true, type: 'iframe', link: `https://vidsrc.cc/v2/embed/anime/${mal_id}/${ep}/dub` });
-            
-            // Fallback Mirrors & Aggregators
-            addUniqueServer(servers.extra, { id: 'vidsrc-to', name: 'Mirror 1', custom: true, type: 'iframe', link: `https://vidsrc.to/embed/anime/${mal_id}/${ep}` });
-            addUniqueServer(servers.extra, { id: 'vidsrc-pm', name: 'Mirror 2', custom: true, type: 'iframe', link: `https://vidsrc.pm/embed/anime/${mal_id}/${ep}` });
-            addUniqueServer(servers.extra, { id: 'vidsrc-icu', name: 'Mirror 3', custom: true, type: 'iframe', link: `https://vidsrc.icu/embed/anime/${mal_id}/${ep}` });
-            addUniqueServer(servers.extra, { id: 'vidsrc-vip', name: 'Mirror 4', custom: true, type: 'iframe', link: `https://vidsrc.vip/embed/anime/${mal_id}/${ep}` });
-            addUniqueServer(servers.extra, { id: 'vidsrc-in', name: 'Mirror 5', custom: true, type: 'iframe', link: `https://vidsrc.in/embed/anime/${mal_id}/${ep}` });
-            addUniqueServer(servers.extra, { id: 'embed-su', name: 'High Speed 🚀', custom: true, type: 'iframe', link: `https://embed.su/embed/anime/${mal_id}/${ep}` });
-            addUniqueServer(servers.extra, { id: 'vidsrc2-to', name: 'Ultra HD 💎', custom: true, type: 'iframe', link: `https://vidsrc2.to/embed/anime/${mal_id}/${ep}` });
+            addUniqueServer(servers.extra, { id: 'vidlink-pro', name: 'VidLink', custom: true, type: 'iframe', link: `https://vidlink.pro/embed/anime/${mal_id}/${ep}` });
+            addUniqueServer(servers.extra, { id: 'embed-su', name: 'Ultra HD', custom: true, type: 'iframe', link: `https://embed.su/embed/anime/${mal_id}/${ep}` });
         }
         res.json(servers);
     } catch (err) {

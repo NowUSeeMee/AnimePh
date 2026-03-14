@@ -204,19 +204,19 @@ function VideoPlayer() {
 
           {/* Server Switcher UI (Inspired by User Screenshot) */}
           <div className="glass-card p-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-6 justify-between select-none">
-              <div className="flex flex-col gap-4 w-full">
+              <div className="flex flex-col gap-2 w-full">
                 {/* SUB Servers */}
                 {servers.sub.length > 0 && (
-                  <div className="flex items-center gap-4">
-                    <span className="flex items-center justify-center text-[11px] font-black text-white/50 bg-white/5 w-8 h-8 rounded-lg uppercase tracking-tight">
-                      3:
+                  <div className="flex items-center gap-4 py-2">
+                    <span className="flex items-center gap-2 text-[11px] font-black text-white/80 uppercase tracking-tighter min-w-[70px]">
+                      <FiType className="text-yellow-500 text-sm" /> SUB:
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {servers.sub.map((s) => (
                         <button
                           key={s.id}
                           onClick={() => { setSelectedType('sub'); handleServerChange(s); }}
-                          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all border ${selectedServer?.id === s.id && !selectedServer?.custom ? 'bg-[#FFD700] border-[#FFD700] text-black shadow-[0_0_20px_rgba(255,215,0,0.3)]' : 'bg-[#2a2a2a] border-white/5 text-white/70 hover:bg-[#333] hover:text-white'}`}
+                          className={`px-5 py-2.5 rounded-lg text-xs font-bold transition-all border ${selectedServer?.id === s.id ? 'bg-[#FFCC4D] border-[#FFCC4D] text-black shadow-[0_0_20px_rgba(255,204,77,0.3)]' : 'bg-[#2a2a2a] border-white/5 text-white/60 hover:bg-[#333] hover:text-white'}`}
                         >
                           {s.name}
                         </button>
@@ -225,18 +225,22 @@ function VideoPlayer() {
                   </div>
                 )}
                 
+                {servers.sub.length > 0 && servers.dub.length > 0 && (
+                   <div className="border-t border-dashed border-white/10 my-1"></div>
+                )}
+                
                 {/* DUB Servers */}
                 {servers.dub.length > 0 && (
-                  <div className="flex items-center gap-4">
-                    <span className="flex items-center justify-center text-[11px] font-black text-white/50 bg-white/5 w-8 h-8 rounded-lg uppercase tracking-tight">
-                      D:
+                  <div className="flex items-center gap-4 py-2">
+                    <span className="flex items-center gap-2 text-[11px] font-black text-white/80 uppercase tracking-tighter min-w-[70px]">
+                      <FiMic className="text-orange-500 text-sm" /> DUB:
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {servers.dub.map((s) => (
                         <button
                           key={s.id}
                           onClick={() => { setSelectedType('dub'); handleServerChange(s); }}
-                          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all border ${selectedServer?.id === s.id && !selectedServer?.custom ? 'bg-[#FFD700] border-[#FFD700] text-black shadow-[0_0_20px_rgba(255,215,0,0.3)]' : 'bg-[#2a2a2a] border-white/5 text-white/70 hover:bg-[#333] hover:text-white'}`}
+                          className={`px-5 py-2.5 rounded-lg text-xs font-bold transition-all border ${selectedServer?.id === s.id ? 'bg-[#FFCC4D] border-[#FFCC4D] text-black shadow-[0_0_20px_rgba(255,204,77,0.3)]' : 'bg-[#2a2a2a] border-white/5 text-white/60 hover:bg-[#333] hover:text-white'}`}
                         >
                           {s.name}
                         </button>
@@ -245,25 +249,27 @@ function VideoPlayer() {
                   </div>
                 )}
 
-                {/* B: Backup Mirrors - Always visible if populated */}
-                {((servers.extra && servers.extra.length > 0) || (servers.mix && servers.mix.length > 0)) && (
-                  <div className="flex items-center gap-4 mt-2 pt-4 border-t border-white/5">
-                    <span className="flex items-center justify-center text-[11px] font-black text-white/50 bg-white/5 w-8 h-8 rounded-lg uppercase tracking-tight">
-                      B:
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                      {/* Mix/Extra Servers */}
-                      {[...(servers.mix || []), ...(servers.extra || [])].map((s) => (
-                        <button
-                          key={s.id}
-                          onClick={() => { setSelectedType('extra'); handleServerChange(s); }}
-                          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all border ${selectedServer?.id === s.id ? 'bg-[#FFD700] border-[#FFD700] text-black shadow-[0_0_20px_rgba(255,215,0,0.3)]' : 'bg-[#2a2a2a] border-white/5 text-white/70 hover:bg-[#333] hover:text-white'}`}
-                        >
-                          {s.name}
-                        </button>
-                      ))}
+                {/* B: Backup Mirrors - Only show if extra exists */}
+                {servers.extra && servers.extra.length > 0 && (
+                  <>
+                    <div className="border-t border-dashed border-white/10 my-1"></div>
+                    <div className="flex items-center gap-4 py-2">
+                      <span className="flex items-center gap-2 text-[11px] font-black text-white/80 uppercase tracking-tighter min-w-[70px]">
+                        <FiMaximize className="text-blue-500 text-sm" /> BKP:
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {servers.extra.map((s) => (
+                          <button
+                            key={s.id}
+                            onClick={() => { setSelectedType('extra'); handleServerChange(s); }}
+                            className={`px-5 py-2.5 rounded-lg text-xs font-bold transition-all border ${selectedServer?.id === s.id ? 'bg-[#FFCC4D] border-[#FFCC4D] text-black shadow-[0_0_20px_rgba(255,204,77,0.3)]' : 'bg-[#2a2a2a] border-white/5 text-white/60 hover:bg-[#333] hover:text-white'}`}
+                          >
+                            {s.name}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  </>
                 )}
                 
                 {/* Deployment Sync Check Hint */}

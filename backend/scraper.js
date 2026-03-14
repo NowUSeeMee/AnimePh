@@ -71,24 +71,59 @@ async function scrapeEpisodesForTitle(title, titleEnglish) {
         const searchRes = await axiosInstance.get(`/search?keyword=${encodeURIComponent(searchTitle)}`);
         const $ = cheerio.load(searchRes.data);
 
-        // 2. Find the first match (usually the most relevant)
-        const firstMatch = $('.film-detail .dynamic-name').first();
-        const link = firstMatch.attr('href');
-        
-        if (link) {
-            // 3. Extract the ID from the link (e.g., /watch/naruto-shippuden-355 -> 355)
-            // Strip any query params like ?ref=search
-            const animeId = link.split('?')[0].split('-').pop();
+        // 2. Find the best match among results
+        let results = [];
+        $('.flw-item').each((i, el) => {
+            const filmDetail = $(el).find('.film-detail');
+            const nameEl = filmDetail.find('.dynamic-name');
+            const resultTitle = nameEl.text().trim();
+            const resultLink = nameEl.attr('href');
+            results.push({ title: resultTitle, link: resultLink });
+        });
+
+        if (results.length > 0) {
+            // Priority 1: Exact Match (case-insensitive)
+            let bestMatch = results.find(r => r.title.toLowerCase() === searchTitle.toLowerCase());
             
-            console.log(`[Scraper] Found match: ${firstMatch.text()} (ID: ${animeId}). Fetching episodes...`);
+            // Priority 2: Title starts with searchTitle and is NOT a special/OVA/Movie
+            if (!bestMatch) {
+                const filtered = results.filter(r => {
+                    const lowTitle = r.title.toLowerCase();
+                    const lowSearch = searchTitle.toLowerCase();
+                    return lowTitle.startsWith(lowSearch) && 
+                           !lowTitle.includes('ova') && 
+                           !lowTitle.includes('special') && 
+                           !lowTitle.includes('movie') &&
+                           !lowTitle.includes('recap');
+                });
+                // Pick the shortest title among filtered (usually the main series)
+                if (filtered.length > 0) {
+                    bestMatch = filtered.sort((a, b) => a.title.length - b.title.length)[0];
+                }
+            }
+
+            // Priority 3: First result as absolute fallback
+            if (!bestMatch) {
+                bestMatch = results[0];
+            }
+
+            // 3. Extract the ID robustly using regex (digits at the end of the slug)
+            const idMatch = bestMatch.link.split('?')[0].match(/-(\d+)$/);
+            const animeId = idMatch ? idMatch[1] : bestMatch.link.split('-').pop();
+            
+            console.log(`[Scraper] Found best match: ${bestMatch.title} (ID: ${animeId}) for "${searchTitle}"`);
 
             // 4. Hit the AJAX endpoint to get the full episode list for that ID
             const episodes = await fetchEpisodesFromId(animeId);
-            console.log(`[Scraper] Successfully scraped ${episodes.length} episodes for ${searchTitle}`);
             
-            return episodes;
+            if (episodes && episodes.length > 0) {
+              console.log(`[Scraper] Successfully scraped ${episodes.length} episodes for ${searchTitle}`);
+              return episodes;
+            } else {
+              console.log(`[Scraper] Found title but 0 episodes for ID ${animeId}. Trying next title...`);
+            }
         } else {
-            console.log(`[Scraper] Could not find any anime matching: ${searchTitle}`);
+            console.log(`[Scraper] No results found on provider for: ${searchTitle}`);
         }
     }
 
