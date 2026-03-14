@@ -4,6 +4,7 @@ const mysql = require('mysql2/promise');
 const cors = require('cors');
 const compression = require('compression');
 const { scrapeEpisodesForTitle, fetchServers, fetchSources } = require('./scraper');
+const { fetchConsumetEpisodes, fetchConsumetServers } = require('./consumetScraper');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -168,11 +169,17 @@ app.get('/api/episodes/:id', async (req, res) => {
         }
 
         console.log(`[Backend] No episodes cached for MAL ID ${malId} (${title}). Scraping provider...`);
-        const scrapedEpisodes = await scrapeEpisodesForTitle(title, titleEnglish);
+        let scrapedEpisodes = await scrapeEpisodesForTitle(title, titleEnglish);
+
+        // Advanced Fix 2: Consumet Fallback
+        if (!scrapedEpisodes || scrapedEpisodes.length === 0) {
+            console.log(`[Backend] Primary scraper failed. Falling back to Consumet...`);
+            scrapedEpisodes = await fetchConsumetEpisodes(title);
+        }
 
         if (!scrapedEpisodes || scrapedEpisodes.length === 0) {
-            console.log(`[Backend] Scraper returned 0 episodes for ${title}`);
-            return res.status(404).json({ error: "No episodes found from scraper." });
+            console.log(`[Backend] All scrapers returned 0 episodes for ${title}`);
+            return res.status(404).json({ error: "No episodes found from scraper or fallback." });
         }
 
         // 3. Optional: Save to DB in background
@@ -228,7 +235,7 @@ app.get('/api/episodes/servers/:episodeId', async (req, res) => {
                 }
             };
 
-            // Only add essential mirrors to avoid clutter
+            // Advanced Fix 3: Diverse Servers
             addUniqueServer(servers.extra, { id: 'vidsrc-xyz', name: 'VidSrc (Main)', custom: true, type: 'iframe', link: `https://vidsrc.xyz/embed/anime/${mal_id}/${ep}` });
             addUniqueServer(servers.extra, { id: 'vidlink-pro', name: 'VidLink', custom: true, type: 'iframe', link: `https://vidlink.pro/embed/anime/${mal_id}/${ep}` });
             addUniqueServer(servers.extra, { id: 'embed-su', name: 'Ultra HD', custom: true, type: 'iframe', link: `https://embed.su/embed/anime/${mal_id}/${ep}` });
@@ -237,6 +244,21 @@ app.get('/api/episodes/servers/:episodeId', async (req, res) => {
             addUniqueServer(servers.extra, { id: 'vidsrc-cc', name: 'VidSrc-CC', custom: true, type: 'iframe', link: `https://vidsrc.cc/v2/embed/anime/${mal_id}/${ep}/sub` });
             addUniqueServer(servers.extra, { id: 'vidsrc2-to', name: 'Server 2', custom: true, type: 'iframe', link: `https://vidsrc2.to/embed/anime/${mal_id}/${ep}` });
             addUniqueServer(servers.extra, { id: 'multi-vidsrc', name: 'Multi-Src', custom: true, type: 'iframe', link: `https://vidsrc.in/embed/anime/${mal_id}/${ep}` });
+            
+            // Additional Diverse Mirrors
+            addUniqueServer(servers.extra, { id: 'filemoon', name: 'Filemoon', custom: true, type: 'iframe', link: `https://filemoon.sx/e/${mal_id}` }); // Note: Generic link, will need better ID in future
+            addUniqueServer(servers.extra, { id: 'streamsb', name: 'StreamSB', custom: true, type: 'iframe', link: `https://streamsb.net/e/${mal_id}` });
+            addUniqueServer(servers.extra, { id: 'doodstream', name: 'DoodStream', custom: true, type: 'iframe', link: `https://dood.to/e/${mal_id}` });
+
+            // Fetch Consumet Servers as additional fallbacks
+            try {
+                const consumetServers = await fetchConsumetServers(req.params.episodeId);
+                if (consumetServers.sub) {
+                    consumetServers.sub.forEach(cs => addUniqueServer(servers.sub, cs));
+                }
+            } catch (csErr) {
+                console.warn('[Backend] Consumet server fetch failed:', csErr.message);
+            }
         }
         res.json(servers);
     } catch (err) {
@@ -251,6 +273,31 @@ app.get('/api/episodes/sources/:serverId', async (req, res) => {
         res.json(sourceData);
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+});
+
+// ✅ ADVANCED FIX 1: Backend Proxy to bypass domain blocking
+app.get('/api/proxy', async (req, res) => {
+    const targetUrl = req.query.url;
+    if (!targetUrl) return res.status(400).json({ error: 'URL is required' });
+
+    try {
+        const response = await axios.get(targetUrl, {
+            responseType: 'stream',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+                'Referer': new URL(targetUrl).origin
+            }
+        });
+        
+        // Pass through headers that might be important
+        if (response.headers['content-type']) res.setHeader('Content-Type', response.headers['content-type']);
+        if (response.headers['content-length']) res.setHeader('Content-Length', response.headers['content-length']);
+        
+        response.data.pipe(res);
+    } catch (err) {
+        console.error('[Proxy Error]:', err.message);
+        res.status(502).json({ error: 'Failed to fetch target URL' });
     }
 });
 
